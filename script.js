@@ -6,14 +6,14 @@ const BASE_URL = `https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/all/$
 
 wikiFetch(BASE_URL);
 
+
+// Asynchronous function that gets our data from the Wikipedia API.
 async function wikiFetch(URL) {
   try {
     const res = await fetch(URL);
     const jsonObject = await res.json();
-
     // Number of entries we want per content block.
     const entriesNum = 5;
-
     // Store the API responses as arrays in their individual categories.
     const births = jsonObject.births;
     const deaths = jsonObject.births;
@@ -25,6 +25,7 @@ async function wikiFetch(URL) {
     console.log(error);
   }
 }
+
 // Select random entries from the "selection" array returned by our API call.
 function getSelected(selected, entriesNum, selection = {}, selections = []) {
   // Generate random numbers to use as indexes to pull from the "selection" array.
@@ -35,33 +36,6 @@ function getSelected(selected, entriesNum, selection = {}, selections = []) {
     selections.push({ year: currSelection.year, description: currSelection.text });
   }
   // Sort the array by year in order to display the information chronologically.
-  const selectionsSorted = [];
-  let compYear = 0;
-  for (let i = 0; i < entriesNum; i++) {
-    if (selections[i].year > compYear) {
-      console.log(`${selections[i].year} is greater than ${compYear}`);
-      selectionsSorted.push(selections[i].year)
-      compYear = selections[i].year;
-      console.log(selectionsSorted);
-    }
-    else {
-      console.log(`${selections[i].year} is less than ${compYear}`);
-      for (let j = 0; j < selectionsSorted.length; j++) {
-        console.log(selections[i].year, selectionsSorted[j]);
-      }
-
-    }
-
-
-    // if (selectionsSorted.length === 0) {
-    //   selectionsSorted.push(selections[i]);
-    //   console.log(selections[i].year);
-    // }
-    // else {
-    //   if (selections[i].year )
-    // }
-  }
-  console.log(selectionsSorted);
 }
 
 // Create and return an array of random numbers based off the number of entries that were returned. Limit the amount of 
@@ -76,3 +50,9 @@ function randomSelection(upperLimit, entriesNum, randArr = []) {
   return (randArr);
 }
 
+// Add our selections to the DOM.
+function selectionsToDOM(selections) {
+  for (const selection of selections) {
+    //console.log(selection);
+  }
+}
