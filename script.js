@@ -1,10 +1,19 @@
 const today = new Date();
 const day = String(today.getDate()).padStart(2, '0');
-const month = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+const month = String(today.getMonth() + 1).padStart(2, '0');
+const monthArr = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const year = today.getFullYear();
 const BASE_URL = `https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/all/${month}/${day}`;
 
 wikiFetch(BASE_URL);
+
+function setUpNavBar(day, month, monthArr, year) {
+  const nav = document.getElementsByTagName("nav");
+  const todayIs = document.getElementById("today");
+  todayIs.innerText = `Today is ${monthArr[month - 1]} ${day}, ${year}.`;
+  nav.append(todayIs);
+}
+
 
 
 // Asynchronous function that gets our data from the Wikipedia API.
@@ -27,7 +36,7 @@ async function wikiFetch(URL) {
 }
 
 // Select random entries from the "selection" array returned by our API call.
-function getSelected(selected, entriesNum, selection = {}, selections = []) {
+function getSelected(selected, entriesNum, selections = []) {
   // Generate random numbers to use as indexes to pull from the "selection" array.
   const randEntries = randomSelection(selected.length, entriesNum);
   // Loop through our random array and pull out the entry at the random index.
@@ -36,6 +45,10 @@ function getSelected(selected, entriesNum, selection = {}, selections = []) {
     selections.push({ year: currSelection.year, description: currSelection.text });
   }
   // Sort the array by year in order to display the information chronologically.
+  selections.sort((a, b) => a.year - b.year);
+
+  // Add the sorted data to the DOM.
+  selectionsToDOM(selections);
 }
 
 // Create and return an array of random numbers based off the number of entries that were returned. Limit the amount of 
@@ -52,7 +65,11 @@ function randomSelection(upperLimit, entriesNum, randArr = []) {
 
 // Add our selections to the DOM.
 function selectionsToDOM(selections) {
+  const addDiv = document.createElement("div");
   for (const selection of selections) {
-    //console.log(selection);
+    let addP = document.createElement("p");
+    addP.innerHTML = `<span class="date">${selection.year}</span> ${selection.description}`;
+    addDiv.append(addP);
   }
+  document.body.append(addDiv);
 }
