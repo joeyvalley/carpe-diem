@@ -7,7 +7,7 @@ const monthArr = ["January", "February", "March", "April", "May", "June", "July"
 const year = today.getFullYear();
 const wikiAllURL = `https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/all/${month}/${day}`;
 const wikiFeaturedURL = `https://api.wikimedia.org/feed/v1/wikipedia/en/featured/${year}/${month}/${String(today.getDate()).padStart(2, '0')}`;
-const entriesNum = 5;
+const entriesNum = 10;
 
 // Call the functions to set up the page.
 setUpNavBar(day, month, monthArr, year); // Gets and sets the content for the navigation bar.
@@ -32,11 +32,12 @@ async function wikiAllFetch(URL) {
     const jsonObject = await res.json();
     // Store the API responses as arrays in their individual categories.
     const births = jsonObject.births;
-    const deaths = jsonObject.births;
+    const deaths = jsonObject.deaths;
     const events = jsonObject.events;
     const holidays = jsonObject.holidays;
     const selected = jsonObject.selected;
     getSelected(selected, entriesNum);
+    getDeaths(deaths);
   } catch (error) {
     console.log(error);
   }
@@ -76,6 +77,29 @@ function getSelected(selected, entriesNum, selections = []) {
   selectionsToDOM(selections);
 }
 
+function getDeaths(deaths, theDead = []) {
+  const randEntries = randomSelection(deaths.length, entriesNum);
+  for (let i = 0; i < entriesNum; i++) {
+    let death = deaths[randEntries[i]]
+    theDead.push({ name: death.pages[0].normalizedtitle, year: death.year, link: death.pages[0].content_urls.desktop.page, description: death.pages[0].extract, });
+  }
+  theDead.sort((a, b) => a.year - b.year);
+  setDeaths(theDead.reverse());
+}
+
+function setDeaths(theDead) {
+  // Add our selections to the DOM.
+  const containerDiv = document.getElementById("grid-left");
+  const addDiv = document.createElement("div");
+  addDiv.classList.add("grid-box");
+  for (const theDeceased of theDead) {
+    let p = document.createElement("p");
+    p.innerHTML = `<span class="date">${theDeceased.name}</span>, died ${theDeceased.year}<a href="${theDeceased.link} target="_blank">&#128128;</a><br />${theDeceased.description}`;
+    addDiv.append(p);
+  }
+  containerDiv.append(addDiv);
+}
+
 // Create and return an array of random numbers based off the number of entries that were returned. Limit the amount of 
 // random numbers by the number of desired entries.
 function randomSelection(upperLimit, entriesNum, randArr = []) {
@@ -111,12 +135,6 @@ function setFeaturedArticle(article) {
   gridBox.append(img);
   const gridRight = document.getElementById("grid-right");
   gridRight.append(gridBox);
-  const test = document.createElement("div");
-  test.classList.add("grid-box");
-  test.classList.add("hided");
-
-  test.innerHTML = "<p>hi</p>";
-  gridRight.append(test);
 }
 
 // Get the information we want from the news pull of the API.
@@ -143,6 +161,21 @@ function setNews(news) {
   containerDiv.append(addDiv);
 }
 
+// Clear out the extra space at the bottom of each column once all the stuff has been added.
+function clearLastBox() {
+  const leftCol = document.getElementById("grid-left");
+  const centerCol = document.getElementById("grid-center");
+  const rightCol = document.getElementById("grid-right");
+
+  const dummyDiv = document.createElement("div");
+  dummyDiv.classList.add("grid-box");
+  dummyDiv.classList.add("hided");
+
+  leftCol.append(dummyDiv);
+  centerCol.append(dummyDiv);
+  rightCol.append(dummyDiv);
+}
+
 // Copy and paste clock code from W3Schools : )
 function startTime() {
   const today = new Date();
@@ -164,7 +197,7 @@ function checkTime(i) {
 // Get users IP address and pass it to a different API to get their physical location.
 async function getIP() {
   const URL = "https://api.ipify.org/?format=json";
-  const URL2 = "https://ipgeolocation.abstractapi.com/v1/?api_key=44050c553ac64009841a277fe660358f&ip_address="
+  const URL2 = "https://ipgeolocation.abstractapi.com/v1/?api_key=9e5e1f56b5414aee82336cd8ac36ff92&ip_address="
   try {
     const res = await fetch(URL);
     const jsonObject = await res.json();
@@ -176,6 +209,7 @@ async function getIP() {
 
 // Get users physical location.
 async function getLocation(URL) {
+  console.log(URL);
   try {
     const res = await fetch(URL);
     const jsonObject = await res.json();
@@ -183,8 +217,8 @@ async function getLocation(URL) {
     const state = jsonObject.region_iso_code;
     const zipCode = jsonObject.postal_code;
     const country = jsonObject.country_code;
-    const flagEmoji = jsonObject.flag.emoji;
-    setLocation(city, state, zipCode, country, flagEmoji);
+    //const flagEmoji = jsonObject.flag.emoji;
+    setLocation(city, state, zipCode, country);
     getMap(jsonObject.latitude, jsonObject.longitude);
   } catch (error) {
     console.log(error);
@@ -199,5 +233,5 @@ function setLocation(city, state, zipCode, country, flagEmoji) {
 
 // Try to use GoogleMaps API to get a map?
 function getMap(lat, long) {
-  console.log(lat, long);
+  // console.log(lat, long);
 }

@@ -9,7 +9,7 @@ nav {
   left: 0;
   width: 100vw;
   background: darkgrey;
-  padding: 5px 10px 5px 10px;
+  padding: 5px 0px 5px 20px;
   border-bottom: 1px solid black;
   z-index: 1;
 }
@@ -29,7 +29,7 @@ nav p {
 #time {
   position: relative;
   float: right;
-  margin-right: 30px;
+  margin-right: 40px;
 }
 
 #main {
@@ -39,7 +39,6 @@ nav p {
   padding: 10px;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  background: red;
 }
 
 #grid-left {
