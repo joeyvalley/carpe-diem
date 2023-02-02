@@ -7,6 +7,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Today is...</title>
   <script src="script.js" defer></script>
+  <!-- Lodash -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"
+    integrity="sha512-WFN04846sdKMIP5LKNphMaWzU7YpMyCU245etK3g/2ARYbPK9Ub18eG+ljU96qKRCWh+quCY7yefSmlkQw1ANQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -16,15 +20,19 @@
   </nav>
   <div id="main">
     <div id="grid-left">
+      <div class="grid-box" id="birthdays"></div>
     </div>
     <div id="grid-center">
-      <div class="grid-box">
-        <p>hello</p>
-      </div>
+      <div class="grid-box" id="deathdays"></div>
     </div>
     <div id="grid-right">
+      <div class="grid-box" id="history"></div>
+      <div class="grid-box" id="featured"></div>
     </div>
   </div>
+  <footer>
+    <p>Today is...</p>
+  </footer>
 </body>
 
 </html>

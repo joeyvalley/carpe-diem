@@ -39,6 +39,7 @@ async function wikiAllFetch(URL) {
     getBirths(births);
     getDeaths(deaths);
     getSelected(selected, entriesNum);
+    addFooter();
   } catch (error) {
     console.log(error);
   }
@@ -136,6 +137,25 @@ function setDeaths(theDead) {
   containerDiv.append(addDiv);
 }
 
+// Set featured article to the DOM.
+function setFeaturedArticle(article) {
+  const title = article.normalizedtitle;
+  const description = article.extract;
+  const link = article.content_urls.desktop.page;
+
+  const gridBox = document.createElement("div");
+  gridBox.classList.add("grid-box");
+  gridBox.id = article.normalizedtitle;
+  gridBox.innerHTML = `<p class="date">Featured Article  &#128478;</p>`;
+
+  const p = document.createElement("p");
+  p.innerHTML = `<p><span class="date">${title}</span><br />${description}<br /><a href="${link}" target="_blank">More info</a></p>`;
+  gridBox.append(p);
+
+  const gridRight = document.getElementById("grid-right");
+  gridRight.append(gridBox);
+}
+
 // Create and return an array of random numbers based off the number of entries that were returned. Limit the amount of 
 // random numbers by the number of desired entries.
 function randomSelection(upperLimit, entriesNum, randArr = []) {
@@ -146,25 +166,6 @@ function randomSelection(upperLimit, entriesNum, randArr = []) {
     }
   }
   return (randArr);
-}
-
-// Add featured article to the DOM.
-function setFeaturedArticle(article) {
-  const title = article.normalizedtitle;
-  const description = article.extract;
-  const link = article.content_urls.desktop.page;
-
-  const gridBox = document.createElement("div");
-  gridBox.classList.add("grid-box");
-  gridBox.id = article.normalizedtitle;
-  gridBox.innerHTML = "<p>Featured Article</p>";
-
-  const p = document.createElement("p");
-  p.innerHTML = `<p><span class="date">${title}</span><br />${description}<br /><a href="${link}" target="_blank">More info</a></p>`;
-  gridBox.append(p);
-
-  const gridRight = document.getElementById("grid-right");
-  gridRight.append(gridBox);
 }
 
 // Clear out the extra space at the bottom of each column once all the stuff has been added.
