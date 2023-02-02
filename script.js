@@ -4,6 +4,7 @@ const today = new Date();
 const day = String(today.getDate());
 const month = String(today.getMonth() + 1).padStart(2, '0');
 const monthArr = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const monthStr = monthArr[month - 1];
 const year = today.getFullYear();
 const wikiAllURL = `https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/all/${month}/${day}`;
 const wikiFeaturedURL = `https://api.wikimedia.org/feed/v1/wikipedia/en/featured/${year}/${month}/${String(today.getDate()).padStart(2, '0')}`;
@@ -11,6 +12,7 @@ const entriesNum = 10;
 
 // Call the functions to set up the page.
 setUpNavBar(day, month, monthArr, year); // Gets and sets the content for the navigation bar.
+addHeaderEventListeners();
 wikiAllFetch(wikiAllURL); // Gets and sets the content for selected articles, births, deaths, and holidays.
 wikiFeaturedFetch(wikiFeaturedURL); // Gets and sets the content for today's featured article.
 
@@ -18,11 +20,14 @@ function setUpNavBar(day, month, monthArr, year) {
   // Set the date at left.
   const nav = document.querySelector("nav");
   const todayIs = document.getElementById("today");
-  todayIs.innerText = `${monthArr[month - 1]} ${day}, ${year}`;
+  todayIs.innerText = `${monthStr} ${day}, ${year}`;
   // Start the clock.
   startTime();
   // Get IP address and location.
   getIP();
+  // Set up the first grid-box
+  const p = document.getElementById("holidays-p");
+  p.innerHTML = `<span class="date">Today is ${monthStr} ${day}, ${year}.</span> &#128197;`;
 }
 
 // Async function that gets and sets our data from the daily Wikipedia landing page.
@@ -38,8 +43,8 @@ async function wikiAllFetch(URL) {
     const selected = jsonObject.selected;
     getBirths(births);
     getDeaths(deaths);
-    getSelected(selected, entriesNum);
-    addFooter();
+    getHistory(selected);
+    getHolidays(holidays);
   } catch (error) {
     console.log(error);
   }
@@ -61,34 +66,66 @@ async function wikiFeaturedFetch(URL) {
   }
 }
 
-// Select random entries from the "selection" array returned by our API call.
-function getSelected(selected, entriesNum, selections = []) {
+function addHeaderEventListeners() {
+  const headers = Array.from(document.querySelectorAll(".header"));
+  console.log("Adding event listeners");
+  for (const header of headers) {
+    header.addEventListener('click', (event) => {
+      const selected = document.getElementById(`${event.target.id.split("-")[0] + "-content"}`);
+      selected.classList.toggle("content");
+    });
+    // header.addEventListener('mouseover', () => {
+    // })
+  }
+}
+
+function getHistory(selected, entriesNum, selections = []) {
+  console.log("Get history.");
+  console.log(selected.length);
   // Generate random numbers to use as indexes to pull from the "selection" array.
   const randEntries = randomSelection(selected.length, entriesNum);
+  console.log(randEntries);
   // Loop through our random array and pull out the entry at the random index.
   while (randEntries.length > 0) {
     let currSelection = selected[randEntries.pop()];
+    console.log(currSelection);
     selections.push({ year: currSelection.year, description: currSelection.text });
   }
   // Sort the array by year in order to display the information chronologically.
   selections.sort((a, b) => a.year - b.year);
-
   // Add the sorted data to the DOM.
-  setSelected(selections);
+  setHistory(selections);
 }
 
-// Add our selections to the DOM.
-function setSelected(selections) {
-  const containerDiv = document.getElementById("grid-right");
-  const addDiv = document.createElement("div");
-  addDiv.innerHTML = `<p class="date">History  &#128197;</p>`;
-  addDiv.classList.add("grid-box");
+function setHistory(selections) {
+  console.log(selections);
+  const container = document.getElementById("history");
+
+  const content = document.createElement("div");
+  content.classList.add("content");
+  content.id = "history-content";
+
   for (const selection of selections) {
-    let addP = document.createElement("p");
-    addP.innerHTML = `<span class="date">${monthArr[month - 1]} ${day}, ${selection.year}:</span> ${selection.description}`;
-    addDiv.append(addP);
+    let p = document.createElement("p");
+    p.innerHTML = `<span class="date">${monthArr[month - 1]} ${day}, ${selection.year}:</span> ${selection.description}`;
+    content.append(p);
   }
-  containerDiv.append(addDiv);
+  const footer = document.createElement("p");
+  footer.innerHTML = `<p class="bottom">&#127874;  &#127874;</p>`;
+  content.append(footer);
+
+  container.append(content);
+}
+
+function getHolidays(holidays) {
+  const holiday = holidays[0].text;
+  const description = holidays[0].pages[0].extract;
+  const daySuffix = suffix();
+
+  const container = document.getElementById("today-info");
+  const p = document.createElement("p")
+  p.innerHTML = `It is the ${daySuffix} of the year.<br /><br />It's <span class="date">${holiday}</span>. ${description}`;
+  container.append(p);
 }
 
 function getBirths(births, theLiving = []) {
@@ -102,16 +139,23 @@ function getBirths(births, theLiving = []) {
 }
 
 function setBirths(theLiving) {
-  const containerDiv = document.getElementById("grid-left");
-  const addDiv = document.createElement("div");
-  addDiv.innerHTML = `<p class="date">Birthdays &#128118;</p>`;
-  addDiv.classList.add("grid-box");
+
+  const container = document.getElementById("birthdays");
+
+  const content = document.createElement("div");
+  content.classList.add("content");
+  content.id = "birthdays-content";
+
   for (const newborn of theLiving) {
     let p = document.createElement("p");
-    p.innerHTML = `<span class="date"><a href="${newborn.link}" target="_blank">${newborn.name}</a></span>, ${month}/${String(today.getDate()).padStart(2, '0')}/${newborn.year}<br />${newborn.description}`;
-    addDiv.append(p);
+    p.innerHTML = `<span class="date"><a href="${newborn.link}" target="_blank">${newborn.name}</a></span>, ${monthArr[month - 1]} ${String(today.getDate())}, ${newborn.year} <br />${newborn.description}`;
+    content.append(p);
   }
-  containerDiv.append(addDiv);
+  const footer = document.createElement("p");
+  footer.innerHTML = `<p class="bottom">&#127874; ʜᴀᴘᴘʏ ʙɪʀᴛʜᴅᴀʏ &#127874;</p>`;
+  content.append(footer);
+
+  container.append(content);
 }
 
 function getDeaths(deaths, theDead = []) {
@@ -125,40 +169,47 @@ function getDeaths(deaths, theDead = []) {
 }
 
 function setDeaths(theDead) {
-  const containerDiv = document.getElementById("grid-center");
-  const addDiv = document.createElement("div");
-  addDiv.innerHTML = `<p class="date">Deathdays &#128128;</p>`;
-  addDiv.classList.add("grid-box");
+
+  const container = document.getElementById("deathdays");
+
+  const content = document.createElement("div");
+  content.classList.add("content");
+  content.id = "deathdays-content";
+
   for (const theDeceased of theDead) {
     let p = document.createElement("p");
-    p.innerHTML = `<span class="date"><a href="${theDeceased.link}" target="_blank">${theDeceased.name}</a></span>, ${month}/${String(today.getDate()).padStart(2, '0')}/${theDeceased.year}<br />${theDeceased.description}`;
-    addDiv.append(p);
+    p.innerHTML = `<span class="date"><a href="${theDeceased.link}" target="_blank">${theDeceased.name}</a>, ${monthArr[month - 1]} ${String(today.getDate())}, ${theDeceased.year}</span><br />${theDeceased.description} `;
+    content.append(p);
   }
-  containerDiv.append(addDiv);
+  const footer = document.createElement("p");
+  footer.innerHTML = `<p class="bottom">&#129702; ʀᴇꜱᴛ ɪɴ ᴘᴇᴀᴄᴇ &#129702;</p>`;
+  content.append(footer);
+
+  container.append(content);
 }
 
 // Set featured article to the DOM.
 function setFeaturedArticle(article) {
+
   const title = article.normalizedtitle;
   const description = article.extract;
   const link = article.content_urls.desktop.page;
 
-  const gridBox = document.createElement("div");
-  gridBox.classList.add("grid-box");
-  gridBox.id = article.normalizedtitle;
-  gridBox.innerHTML = `<p class="date">Featured Article  &#128478;</p>`;
+  const container = document.getElementById("featured");
+  const content = document.createElement("div");
+  content.classList.add("content");
+  content.id = "featured-content";
 
   const p = document.createElement("p");
-  p.innerHTML = `<p><span class="date">${title}</span><br />${description}<br /><a href="${link}" target="_blank">More info</a></p>`;
-  gridBox.append(p);
-
-  const gridRight = document.getElementById("grid-right");
-  gridRight.append(gridBox);
+  p.innerHTML = `<p><span class="date">${title}</span><br />${description}<br /><a href="${link}" target="_blank">More info</a></p> `;
+  content.append(p);
+  container.append(content);
 }
 
 // Create and return an array of random numbers based off the number of entries that were returned. Limit the amount of 
 // random numbers by the number of desired entries.
 function randomSelection(upperLimit, entriesNum, randArr = []) {
+  console.log("Random Selection");
   while (randArr.length < entriesNum) {
     let randNum = Math.floor(Math.random() * upperLimit);
     if (!randArr.includes(randNum)) {
@@ -166,21 +217,6 @@ function randomSelection(upperLimit, entriesNum, randArr = []) {
     }
   }
   return (randArr);
-}
-
-// Clear out the extra space at the bottom of each column once all the stuff has been added.
-function clearLastBox() {
-  const leftCol = document.getElementById("grid-left");
-  const centerCol = document.getElementById("grid-center");
-  const rightCol = document.getElementById("grid-right");
-
-  const dummyDiv = document.createElement("div");
-  dummyDiv.classList.add("grid-box");
-  dummyDiv.classList.add("hided");
-
-  leftCol.append(dummyDiv);
-  centerCol.append(dummyDiv);
-  rightCol.append(dummyDiv);
 }
 
 // Copy and paste clock code from W3Schools : )
@@ -234,10 +270,33 @@ async function getLocation(URL) {
 // Set users physical location in the navigation bar.
 function setLocation(city, state, zipCode, country, flagEmoji) {
   const location = document.getElementById("location");
-  location.innerText = `${city}, ${state} ${zipCode}`;
+  location.innerText = `${city}, ${state} ${zipCode} `;
 }
 
 // Try to use GoogleMaps API to get a map?
 function getMap(lat, long) {
   // console.log(lat, long);
 }
+
+// Copied from Stack Overflow, adds the correct suffix to our date.
+function suffix() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const diff = now - start;
+  const oneDay = 1000 * 60 * 60 * 24;
+  const i = Math.floor(diff / oneDay);
+  var j = i % 10,
+    k = i % 100;
+  if (j == 1 && k != 11) {
+    return i + "st";
+  }
+  if (j == 2 && k != 12) {
+    return i + "nd";
+  }
+  if (j == 3 && k != 13) {
+    return i + "rd";
+  }
+  return i + "th";
+}
+
+
