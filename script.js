@@ -36,8 +36,9 @@ async function wikiAllFetch(URL) {
     const events = jsonObject.events;
     const holidays = jsonObject.holidays;
     const selected = jsonObject.selected;
-    getSelected(selected, entriesNum);
+    getBirths(births);
     getDeaths(deaths);
+    getSelected(selected, entriesNum);
   } catch (error) {
     console.log(error);
   }
@@ -53,9 +54,7 @@ async function wikiFeaturedFetch(URL) {
     // Store the API responses as arrays in their individual categories.
     const featuredArticle = jsonObject.tfa;
     const mostRead = jsonObject.mostread;
-    const news = jsonObject.news;
     setFeaturedArticle(featuredArticle);
-    getNews(news, entriesNum);
   } catch (error) {
     console.log(error);
   }
@@ -74,7 +73,44 @@ function getSelected(selected, entriesNum, selections = []) {
   selections.sort((a, b) => a.year - b.year);
 
   // Add the sorted data to the DOM.
-  selectionsToDOM(selections);
+  setSelected(selections);
+}
+
+// Add our selections to the DOM.
+function setSelected(selections) {
+  const containerDiv = document.getElementById("grid-right");
+  const addDiv = document.createElement("div");
+  addDiv.innerHTML = `<p class="date">History  &#128197;</p>`;
+  addDiv.classList.add("grid-box");
+  for (const selection of selections) {
+    let addP = document.createElement("p");
+    addP.innerHTML = `<span class="date">${monthArr[month - 1]} ${day}, ${selection.year}:</span> ${selection.description}`;
+    addDiv.append(addP);
+  }
+  containerDiv.append(addDiv);
+}
+
+function getBirths(births, theLiving = []) {
+  const randEntries = randomSelection(births.length, entriesNum);
+  for (let i = 0; i < entriesNum; i++) {
+    let birth = births[randEntries[i]]
+    theLiving.push({ name: birth.pages[0].normalizedtitle, year: birth.year, link: birth.pages[0].content_urls.desktop.page, description: birth.pages[0].extract, });
+  }
+  theLiving.sort((a, b) => a.year - b.year);
+  setBirths(theLiving.reverse());
+}
+
+function setBirths(theLiving) {
+  const containerDiv = document.getElementById("grid-left");
+  const addDiv = document.createElement("div");
+  addDiv.innerHTML = `<p class="date">Birthdays &#128118;</p>`;
+  addDiv.classList.add("grid-box");
+  for (const newborn of theLiving) {
+    let p = document.createElement("p");
+    p.innerHTML = `<span class="date"><a href="${newborn.link}" target="_blank">${newborn.name}</a></span>, ${month}/${String(today.getDate()).padStart(2, '0')}/${newborn.year}<br />${newborn.description}`;
+    addDiv.append(p);
+  }
+  containerDiv.append(addDiv);
 }
 
 function getDeaths(deaths, theDead = []) {
@@ -88,13 +124,13 @@ function getDeaths(deaths, theDead = []) {
 }
 
 function setDeaths(theDead) {
-  // Add our selections to the DOM.
-  const containerDiv = document.getElementById("grid-left");
+  const containerDiv = document.getElementById("grid-center");
   const addDiv = document.createElement("div");
+  addDiv.innerHTML = `<p class="date">Deathdays &#128128;</p>`;
   addDiv.classList.add("grid-box");
   for (const theDeceased of theDead) {
     let p = document.createElement("p");
-    p.innerHTML = `<span class="date">${theDeceased.name}</span>, died ${theDeceased.year}<a href="${theDeceased.link} target="_blank">&#128128;</a><br />${theDeceased.description}`;
+    p.innerHTML = `<span class="date"><a href="${theDeceased.link}" target="_blank">${theDeceased.name}</a></span>, ${month}/${String(today.getDate()).padStart(2, '0')}/${theDeceased.year}<br />${theDeceased.description}`;
     addDiv.append(p);
   }
   containerDiv.append(addDiv);
@@ -112,53 +148,23 @@ function randomSelection(upperLimit, entriesNum, randArr = []) {
   return (randArr);
 }
 
-// Add our selections to the DOM.
-function selectionsToDOM(selections) {
-  const containerDiv = document.getElementById("grid-left");
-  const addDiv = document.createElement("div");
-  addDiv.classList.add("grid-box");
-  for (const selection of selections) {
-    let addP = document.createElement("p");
-    addP.innerHTML = `<span class="date">${selection.year}</span> ${selection.description}`;
-    addDiv.append(addP);
-  }
-  containerDiv.append(addDiv);
-}
-
 // Add featured article to the DOM.
 function setFeaturedArticle(article) {
+  const title = article.normalizedtitle;
+  const description = article.extract;
+  const link = article.content_urls.desktop.page;
+
   const gridBox = document.createElement("div");
   gridBox.classList.add("grid-box");
   gridBox.id = article.normalizedtitle;
-  const img = document.createElement("img");
-  img.src = article.originalimage.source;
-  gridBox.append(img);
+  gridBox.innerHTML = "<p>Featured Article</p>";
+
+  const p = document.createElement("p");
+  p.innerHTML = `<p><span class="date">${title}</span><br />${description}<br /><a href="${link}" target="_blank">More info</a></p>`;
+  gridBox.append(p);
+
   const gridRight = document.getElementById("grid-right");
   gridRight.append(gridBox);
-}
-
-// Get the information we want from the news pull of the API.
-function getNews(articles, entriesNum, newsArray = []) {
-  for (let i = 0; i < entriesNum; i++) {
-    let description = articles[i].links[0].extract;
-    let link = articles[i].links[0].content_urls.desktop.page;
-    newsArray.push({ link: link, description: description });
-  }
-  setNews(newsArray);
-}
-
-// Add the Wikipedia news to the DOM.
-function setNews(news) {
-  // Add our selections to the DOM.
-  const containerDiv = document.getElementById("grid-center");
-  const addDiv = document.createElement("div");
-  addDiv.classList.add("grid-box");
-  for (const article of news) {
-    let p = document.createElement("p");
-    p.innerHTML = `${article.description}<br /><a href="${article.link}" target="_blank">${article.link}</a>`;
-    addDiv.append(p);
-  }
-  containerDiv.append(addDiv);
 }
 
 // Clear out the extra space at the bottom of each column once all the stuff has been added.
@@ -209,7 +215,6 @@ async function getIP() {
 
 // Get users physical location.
 async function getLocation(URL) {
-  console.log(URL);
   try {
     const res = await fetch(URL);
     const jsonObject = await res.json();
