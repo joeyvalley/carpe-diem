@@ -112,15 +112,10 @@ footer p {
 }
 
 .content {
-  display: none;
-}
-
-.visually-hidden {
-  opacity: 1;
-  transition: opacity 0.2s linear;
+  /* display: none; */
 }
 
 .show {
-  display: contents;
+  display: none;
 
 }

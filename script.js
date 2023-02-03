@@ -11,16 +11,17 @@ const wikiFeaturedURL = `https://api.wikimedia.org/feed/v1/wikipedia/en/featured
 const entriesNum = 10;
 
 // Call the functions to set up the page.
-setUpNavBar(day, month, monthArr, year); // Gets and sets the content for the navigation bar.
+setUpNavBar(); // Gets and sets the content for the navigation bar.
 addHeaderEventListeners();
 wikiAllFetch(wikiAllURL); // Gets and sets the content for selected articles, births, deaths, and holidays.
 wikiFeaturedFetch(wikiFeaturedURL); // Gets and sets the content for today's featured article.
+nyTimesFetch();
 
-function setUpNavBar(day, month, monthArr, year) {
+function setUpNavBar() {
   // Set the date at left.
   const nav = document.querySelector("nav");
-  const todayIs = document.getElementById("today");
-  todayIs.innerText = `${monthStr} ${day}, ${year}`;
+  // const todayIs = document.getElementById("today");
+  // todayIs.innerText = `${monthStr} ${day}, ${year}`;
   // Start the clock.
   startTime();
   // Get IP address and location.
@@ -46,7 +47,7 @@ async function wikiAllFetch(URL) {
     getHistory(selected);
     getHolidays(holidays);
   } catch (error) {
-    console.log(error);
+    alert("Wikipedia is taking too long.")
   }
 }
 
@@ -62,33 +63,61 @@ async function wikiFeaturedFetch(URL) {
     const mostRead = jsonObject.mostread;
     setFeaturedArticle(featuredArticle);
   } catch (error) {
-    console.log(error);
+    alert("Wikipedia is taking too long.")
   }
+}
+
+async function nyTimesFetch(articlesArr = [], sections = ['us', 'world', 'business', 'style', 'crosswords']) {
+  const URL = "https://api.nytimes.com/svc/topstories/v2/home.json?api-key=DmexZKsgYhcssqlm8cy4sd1tMa7D6Uri";
+
+  try {
+    const res = await fetch(URL);
+    const jsonObject = await res.json();
+    const articles = jsonObject.results;
+    articlesArr = sections.map(s => articles.find(a => a.section === s));
+    setNewsArticles(articlesArr.sort((a, b) => a.section.localeCompare(b.section)));
+  }
+  catch (error) {
+    alert(error);
+  }
+}
+
+function setNewsArticles(articles) {
+  const container = document.getElementById("news");
+  const content = document.createElement("div");
+  content.classList.add("content");
+  content.id = "news-content";
+  articles.forEach(article => {
+    const p = document.createElement("p");
+    p.innerHTML = `<span class="date">${article.title}</span><br/>${article.abstract}`;
+    content.append(p);
+  });
+  const footer = document.createElement("p");
+  footer.classList.add("bottom");
+  footer.innerHTML = "&#128169; ᴀʟʟ ᴛʜᴇ ᴍᴜᴄᴋ ᴛʜᴀᴛs ꜰɪᴛ ᴛᴏ ʀᴀᴋᴇ &#128169;";
+  content.append(footer);
+
+  container.append(content);
 }
 
 function addHeaderEventListeners() {
   const headers = Array.from(document.querySelectorAll(".header"));
-  console.log("Adding event listeners");
   for (const header of headers) {
     header.addEventListener('click', (event) => {
       const selected = document.getElementById(`${event.target.id.split("-")[0] + "-content"}`);
-      selected.classList.toggle("content");
+      selected.classList.toggle("show");
     });
     // header.addEventListener('mouseover', () => {
     // })
   }
 }
 
-function getHistory(selected, entriesNum, selections = []) {
-  console.log("Get history.");
-  console.log(selected.length);
+function getHistory(selected, selections = []) {
   // Generate random numbers to use as indexes to pull from the "selection" array.
   const randEntries = randomSelection(selected.length, entriesNum);
-  console.log(randEntries);
   // Loop through our random array and pull out the entry at the random index.
   while (randEntries.length > 0) {
     let currSelection = selected[randEntries.pop()];
-    console.log(currSelection);
     selections.push({ year: currSelection.year, description: currSelection.text });
   }
   // Sort the array by year in order to display the information chronologically.
@@ -98,7 +127,6 @@ function getHistory(selected, entriesNum, selections = []) {
 }
 
 function setHistory(selections) {
-  console.log(selections);
   const container = document.getElementById("history");
 
   const content = document.createElement("div");
@@ -111,7 +139,7 @@ function setHistory(selections) {
     content.append(p);
   }
   const footer = document.createElement("p");
-  footer.innerHTML = `<p class="bottom">&#127874;  &#127874;</p>`;
+  footer.innerHTML = `<p class="bottom">&#128220; ᴄᴀʀᴘᴇ ᴅɪᴇᴍ &#128220;</p>`;
   content.append(footer);
 
   container.append(content);
@@ -201,7 +229,7 @@ function setFeaturedArticle(article) {
   content.id = "featured-content";
 
   const p = document.createElement("p");
-  p.innerHTML = `<p><span class="date">${title}</span><br />${description}<br /><a href="${link}" target="_blank">More info</a></p> `;
+  p.innerHTML = `<span class="date"><a href="${link}" target="_blank">${title}</a></span><br />${description}`;
   content.append(p);
   container.append(content);
 }
@@ -209,13 +237,13 @@ function setFeaturedArticle(article) {
 // Create and return an array of random numbers based off the number of entries that were returned. Limit the amount of 
 // random numbers by the number of desired entries.
 function randomSelection(upperLimit, entriesNum, randArr = []) {
-  console.log("Random Selection");
   while (randArr.length < entriesNum) {
     let randNum = Math.floor(Math.random() * upperLimit);
     if (!randArr.includes(randNum)) {
       randArr.push(randNum);
     }
   }
+
   return (randArr);
 }
 
