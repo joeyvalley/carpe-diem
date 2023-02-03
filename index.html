@@ -10,14 +10,21 @@
 
   <!-- Google Maps -->
   <script src="script.js" defer></script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyApfy7oK9rqcXH8J-WA07WcFe9dYKB-oAg" async
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyABYjJ_2YRF-Q5PoShOfw_zFKTrUk_w3cI" async
     defer></script>
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
   <nav>
-    <span id="today" class="date"></span><span id="location" class="date"></span><span id="time" class="date"></span>
+    <span class="date">
+      Today is
+      <select id="today">
+      </select>
+    </span>
+    <!-- <span id="location" class="date"></span> -->
+
+    <span id="time" class="date"></span>
   </nav>
   <div id="main">
     <div id="grid-left">
@@ -61,10 +68,11 @@
         </div>
       </div>
     </div>
+
   </div>
-  <!-- <footer>
-    <p>Today is...</p>
-  </footer> -->
+  <footer>
+    <p>carpe diem &copy; 2023</p>
+  </footer>
 </body>
 
 </html>

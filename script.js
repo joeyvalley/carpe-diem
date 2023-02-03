@@ -20,8 +20,98 @@ nyTimesFetch();
 
 function setUpNavBar() {
   // Set the date at left.
-  const todaySpan = document.getElementById("today");
-  todaySpan.innerHTML = `${month}/${String(today.getDate()).padStart(2, '0')}/${year} &#127757;`;
+  const selectBar = document.getElementById("today");
+
+  // Set the select bar with previous 30 days dates.
+  let dayCounter = today.getDate();
+  let flag = false;
+  for (let i = 0; i <= 30; i++) {
+    if (dayCounter === today.getDate()) {
+      const option = document.createElement("option");
+      option.value = `${month}/${day}/${year}`;
+      option.innerText = `${monthStr} ${day}, ${year}`;
+      selectBar.append(option);
+    }
+    else if (dayCounter === 0 && monthStr === "March") {
+      dayCounter = 28;
+      const option = document.createElement("option");
+      option.value = `${today.getMonth()}/${dayCounter}/${year}`;
+      option.innerText = `${monthArr[today.getMonth() - 1]} ${dayCounter}, ${year}`;
+      selectBar.append(option);
+      flag = true;
+
+    }
+    else if (dayCounter === 0 && (monthStr === "October" || monthStr === "May" || monthStr === "July" || monthStr === "December")) {
+      dayCounter = 30;
+      const option = document.createElement("option");
+      option.value = `${today.getMonth()}/${dayCounter}/${year}`;
+      option.innerText = `${monthArr[today.getMonth() - 1]} ${dayCounter}, ${year}`;
+      selectBar.append(option);
+      flag = true;
+    }
+    else if (dayCounter === 0 && monthStr === "January") {
+      dayCounter = 31;
+      const option = document.createElement("option");
+      option.value = `${today.getMonth()}/${dayCounter}/${year}`;
+      option.innerText = `${monthArr[today.getMonth() - 1]} ${dayCounter}, ${year - 1}`;
+      selectBar.append(option);
+      flag = true;
+
+    }
+    else if (dayCounter === 0) {
+      dayCounter = 31;
+      // console.log(dayCounter);
+      const option = document.createElement("option");
+      option.value = `${today.getMonth()}/${dayCounter}/${year}`;
+      option.innerText = `${monthArr[today.getMonth() - 1]} ${dayCounter}, ${year}`;
+      selectBar.append(option);
+      flag = true;
+    }
+    else if (flag === true) {
+      const option = document.createElement("option");
+      option.value = `${today.getMonth()}/${dayCounter}/${year}`;
+      option.innerText = `${monthArr[today.getMonth() - 1]} ${dayCounter}, ${year}`;
+      selectBar.append(option);
+    }
+    else {
+      const option = document.createElement("option");
+      option.value = `${month}/${day}/${year}`;
+      option.innerText = `${monthStr} ${dayCounter}, ${year}`;
+      selectBar.append(option);
+    }
+    dayCounter--;
+  }
+
+  // Add event listener to select bar to clear out HTML and re-populate with results of new API call.
+  // selectBar.addEventListener('change', (e) => {
+  //   try {
+  //     console.log(e.target.value);
+  //     document.getElementById("news").remove();
+  //     const newMonth = e.target.value.split("/")[0].padStart(2, '0');
+  //     const newDay = e.target.value.split("/")[1].padStart(2, '0');
+  //     const newYear = e.target.value.split("/")[2];
+  //     const newWikiSearch1 = `https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/all/${newMonth}/${newDay}`;
+  //     const newWikiSearch2 = `https://api.wikimedia.org/feed/v1/wikipedia/en/featured/${newYear}/${newMonth}/${newDay}`;
+  //     console.log(newWikiSearch1);
+  //     console.log(newWikiSearch2);
+  //     // console.log(newMonth, newDay, newYear);
+  //     const contentBoxes = Array.from(document.querySelectorAll(".grid-box"));
+  //     for (box in contentBoxes) {
+  //       let contentBox = contentBoxes[box].querySelector(".content");
+  //       if (contentBox === null) {
+  //         console.log("haha");
+  //       }
+  //       else {
+  //         contentBox.innerHTML = "";
+  //       }
+  //     }
+  //     wikiAllFetch(newWikiSearch1);
+  //     wikiFeaturedFetch(newWikiSearch2);
+  //   }
+  //   catch (error) {
+  //     console.log(error);
+  //   }
+  // })
   // Start the clock.
   startTime();
   // Get IP address and location.
@@ -33,6 +123,7 @@ function setUpNavBar() {
 
 // Async function that gets and sets our data from the daily Wikipedia landing page.
 async function wikiAllFetch(URL) {
+  console.log(URL);
   try {
     const res = await fetch(URL);
     const jsonObject = await res.json();
@@ -53,6 +144,7 @@ async function wikiAllFetch(URL) {
 
 // Async function that gets and sets our date from Wikipedia's featured article of the day.
 async function wikiFeaturedFetch(URL) {
+  console.log(URL);
   try {
     const res = await fetch(URL);
     const jsonObject = await res.json();
@@ -114,7 +206,7 @@ function addHeaderEventListeners() {
 
 function getHistory(selected, selections = []) {
   // Generate random numbers to use as indexes to pull from the "selection" array.
-  const randEntries = randomSelection(selected.length, entriesNum);
+  const randEntries = randomSelection(selected.length, 15);
   // Loop through our random array and pull out the entry at the random index.
   while (randEntries.length > 0) {
     let currSelection = selected[randEntries.pop()];
@@ -135,7 +227,7 @@ function setHistory(selections) {
 
   for (const selection of selections) {
     let p = document.createElement("p");
-    p.innerHTML = `<span class="date">${monthArr[month - 1]} ${day}, ${selection.year}:</span> ${selection.description}`;
+    p.innerHTML = `<span class="date">${monthStr} ${day}, ${selection.year}:</span> ${selection.description}`;
     content.append(p);
   }
   const footer = document.createElement("p");
@@ -176,7 +268,7 @@ function setBirths(theLiving) {
 
   for (const newborn of theLiving) {
     let p = document.createElement("p");
-    p.innerHTML = `<span class="date"><a href="${newborn.link}" target="_blank">${newborn.name}</a></span>, ${monthArr[month - 1]} ${String(today.getDate())}, ${newborn.year} <br />${newborn.description}`;
+    p.innerHTML = `<span class="date"><a href="${newborn.link}" target="_blank">${newborn.name}</a>, ${monthStr} ${String(today.getDate())}, ${newborn.year}</span><br />${newborn.description}`;
     content.append(p);
   }
   const footer = document.createElement("p");
@@ -206,7 +298,7 @@ function setDeaths(theDead) {
 
   for (const theDeceased of theDead) {
     let p = document.createElement("p");
-    p.innerHTML = `<span class="date"><a href="${theDeceased.link}" target="_blank">${theDeceased.name}</a>, ${monthArr[month - 1]} ${String(today.getDate())}, ${theDeceased.year}</span><br />${theDeceased.description} `;
+    p.innerHTML = `<span class="date"><a href="${theDeceased.link}" target="_blank">${theDeceased.name}</a>, ${monthStr} ${String(today.getDate())}, ${theDeceased.year}</span><br />${theDeceased.description} `;
     content.append(p);
   }
   const footer = document.createElement("p");
@@ -294,7 +386,9 @@ async function getLocation(URL) {
     setLocation(city, state, zipCode, country);
     initMap(jsonObject.latitude, jsonObject.longitude);
   } catch (error) {
-    console.log(error);
+    // If the Location API shits out, just plug in the center of the universe.
+    console.log("Location API is not working.");
+    initMap(40.712776, -74.005974);
   }
 }
 
@@ -308,7 +402,7 @@ function setLocation(city, state, zipCode, country) {
 function initMap(lat, lang) {
   const map = new google.maps.Map(document.getElementById('map'), {
     center: { lat: lat, lng: lang },
-    zoom: 17,
+    zoom: 14,
     zoomControl: true,
     disableDefaultUI: true,
     mapTypeId: 'roadmap'
@@ -338,3 +432,8 @@ function suffix() {
 }
 
 
+// const middle = document.getElementById("grid-center");
+// middle.addEventListener('mouseover', () => {
+//   const left = document.getElementById("grid-left");
+//   left.style.position = "fixed";
+// });
