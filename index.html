@@ -6,11 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Today is...</title>
+
+  <!-- Google Maps -->
   <script src="script.js" defer></script>
-  <!-- Lodash -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"
-    integrity="sha512-WFN04846sdKMIP5LKNphMaWzU7YpMyCU245etK3g/2ARYbPK9Ub18eG+ljU96qKRCWh+quCY7yefSmlkQw1ANQ=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyApfy7oK9rqcXH8J-WA07WcFe9dYKB-oAg" async
+    defer></script>
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -30,6 +30,13 @@
       </div>
     </div>
     <div id="grid-center">
+      <div class="grid-box">
+        <div class="header">
+          <p>YOu are here.</p>
+        </div>
+        <div class="grid-img" id="map">
+        </div>
+      </div>
       <div class="grid-box" id="deathdays">
         <div class="header">
           <p class="date" id="deathdays-p">Deathdays &#128128;</p>

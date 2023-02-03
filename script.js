@@ -10,6 +10,18 @@ const wikiAllURL = `https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/all
 const wikiFeaturedURL = `https://api.wikimedia.org/feed/v1/wikipedia/en/featured/${year}/${month}/${String(today.getDate()).padStart(2, '0')}`;
 const entriesNum = 10;
 
+// TESTING THE MAP
+function initMap(lat, lang) {
+  const map = new google.maps.Map(document.getElementById('map'), {
+    center: { lat: lat, lng: lang },
+    zoom: 17,
+    zoomControl: true,
+    disableDefaultUI: true,
+    mapTypeId: 'roadmap'
+  });
+  // map.setTilt(45);
+}
+
 // Call the functions to set up the page.
 setUpNavBar(); // Gets and sets the content for the navigation bar.
 addHeaderEventListeners();
@@ -20,8 +32,6 @@ nyTimesFetch();
 function setUpNavBar() {
   // Set the date at left.
   const nav = document.querySelector("nav");
-  // const todayIs = document.getElementById("today");
-  // todayIs.innerText = `${monthStr} ${day}, ${year}`;
   // Start the clock.
   startTime();
   // Get IP address and location.
@@ -47,7 +57,7 @@ async function wikiAllFetch(URL) {
     getHistory(selected);
     getHolidays(holidays);
   } catch (error) {
-    alert("Wikipedia is taking too long.")
+    console.log(error);
   }
 }
 
@@ -63,11 +73,11 @@ async function wikiFeaturedFetch(URL) {
     const mostRead = jsonObject.mostread;
     setFeaturedArticle(featuredArticle);
   } catch (error) {
-    alert("Wikipedia is taking too long.")
+    console.log("Wikipedia is taking too long.")
   }
 }
 
-async function nyTimesFetch(articlesArr = [], sections = ['us', 'world', 'business', 'style', 'crosswords']) {
+async function nyTimesFetch(articlesArr = [], sections = ['us', 'world', 'business', 'opinion', 'crosswords']) {
   const URL = "https://api.nytimes.com/svc/topstories/v2/home.json?api-key=DmexZKsgYhcssqlm8cy4sd1tMa7D6Uri";
 
   try {
@@ -78,7 +88,7 @@ async function nyTimesFetch(articlesArr = [], sections = ['us', 'world', 'busine
     setNewsArticles(articlesArr.sort((a, b) => a.section.localeCompare(b.section)));
   }
   catch (error) {
-    alert(error);
+    console.log(error);
   }
 }
 
@@ -139,7 +149,7 @@ function setHistory(selections) {
     content.append(p);
   }
   const footer = document.createElement("p");
-  footer.innerHTML = `<p class="bottom">&#128220; ᴄᴀʀᴘᴇ ᴅɪᴇᴍ &#128220;</p>`;
+  footer.innerHTML = `<p class="bottom">&#128220; ʟᴇꜱᴛ ᴡᴇ ꜰᴏʀɢᴇᴛ &#128220;</p>`;
   content.append(footer);
 
   container.append(content);
@@ -289,7 +299,7 @@ async function getLocation(URL) {
     const country = jsonObject.country_code;
     //const flagEmoji = jsonObject.flag.emoji;
     setLocation(city, state, zipCode, country);
-    getMap(jsonObject.latitude, jsonObject.longitude);
+    initMap(jsonObject.latitude, jsonObject.longitude);
   } catch (error) {
     console.log(error);
   }
@@ -301,10 +311,16 @@ function setLocation(city, state, zipCode, country, flagEmoji) {
   location.innerText = `${city}, ${state} ${zipCode} `;
 }
 
-// Try to use GoogleMaps API to get a map?
-function getMap(lat, long) {
-  // console.log(lat, long);
-}
+// googleMap();
+// // Try to use GoogleMaps API to get a map.
+// function googleMap() {
+//   // console.log, long);
+//   var mapProp = {
+//     center: new google.maps.LatLng(40.738, -73.9858),
+//     zoom: 5,
+//   };
+//   const map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+// }
 
 // Copied from Stack Overflow, adds the correct suffix to our date.
 function suffix() {

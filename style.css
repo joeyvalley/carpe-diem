@@ -67,26 +67,34 @@ footer p {
   display: grid;
   row-gap: 15px;
   margin-right: 10px;
-  height: 0px;
+  height: fit-content;
 }
 
 #grid-center {
   display: grid;
   row-gap: 15px;
-  height: 0px;
+  height: fit-content;
 }
 
 #grid-right {
   display: grid;
   row-gap: 15px;
   margin-left: 10px;
-  height: 0px;
+  height: fit-content;
 }
 
 .grid-box {
   background-color: lightgray;
   padding: 0px 10px 0px 10px;
   border: 1px solid black;
+}
+
+.grid-img {
+  background-color: lightgray;
+  padding: 0;
+  margin-bottom: 10px;
+  border: 1px solid black;
+  height: 250px;
 }
 
 .grid-box p {
