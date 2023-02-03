@@ -8,19 +8,8 @@ const monthStr = monthArr[month - 1];
 const year = today.getFullYear();
 const wikiAllURL = `https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/all/${month}/${day}`;
 const wikiFeaturedURL = `https://api.wikimedia.org/feed/v1/wikipedia/en/featured/${year}/${month}/${String(today.getDate()).padStart(2, '0')}`;
-const entriesNum = 10;
+const entriesNum = 5;
 
-// TESTING THE MAP
-function initMap(lat, lang) {
-  const map = new google.maps.Map(document.getElementById('map'), {
-    center: { lat: lat, lng: lang },
-    zoom: 17,
-    zoomControl: true,
-    disableDefaultUI: true,
-    mapTypeId: 'roadmap'
-  });
-  // map.setTilt(45);
-}
 
 // Call the functions to set up the page.
 setUpNavBar(); // Gets and sets the content for the navigation bar.
@@ -31,7 +20,8 @@ nyTimesFetch();
 
 function setUpNavBar() {
   // Set the date at left.
-  const nav = document.querySelector("nav");
+  const todaySpan = document.getElementById("today");
+  todaySpan.innerHTML = `${month}/${String(today.getDate()).padStart(2, '0')}/${year} &#127757;`;
   // Start the clock.
   startTime();
   // Get IP address and location.
@@ -162,7 +152,7 @@ function getHolidays(holidays) {
 
   const container = document.getElementById("today-info");
   const p = document.createElement("p")
-  p.innerHTML = `It is the ${daySuffix} of the year.<br /><br />It's <span class="date">${holiday}</span>. ${description}`;
+  p.innerHTML = `It is the <span class="date">${daySuffix}</span> of the year.<br /><br />It's <span class="date">${holiday}</span>. ${description}`;
   container.append(p);
 }
 
@@ -261,11 +251,13 @@ function randomSelection(upperLimit, entriesNum, randArr = []) {
 function startTime() {
   const today = new Date();
   let h = today.getHours();
+  let AMPM = "AM";
+  if (h > 12) { h = h - 12; AMPM = "PM"; }
   let m = today.getMinutes();
   let s = today.getSeconds();
   m = checkTime(m);
   s = checkTime(s);
-  document.getElementById("time").innerText = h + ":" + m + ":" + s;
+  document.getElementById("time").innerHTML = "&#128368;    " + h + ":" + m + ":" + s + " " + AMPM;
   setTimeout(startTime, 1000);
 }
 
@@ -293,11 +285,12 @@ async function getLocation(URL) {
   try {
     const res = await fetch(URL);
     const jsonObject = await res.json();
+    // console.log(jsonObject);
     const city = jsonObject.city;
     const state = jsonObject.region_iso_code;
     const zipCode = jsonObject.postal_code;
     const country = jsonObject.country_code;
-    //const flagEmoji = jsonObject.flag.emoji;
+    // const flagEmoji = jsonObject.flag.emoji;
     setLocation(city, state, zipCode, country);
     initMap(jsonObject.latitude, jsonObject.longitude);
   } catch (error) {
@@ -306,21 +299,22 @@ async function getLocation(URL) {
 }
 
 // Set users physical location in the navigation bar.
-function setLocation(city, state, zipCode, country, flagEmoji) {
+function setLocation(city, state, zipCode, country) {
   const location = document.getElementById("location");
-  location.innerText = `${city}, ${state} ${zipCode} `;
+  location.innerText = `${city}, ${state} ${country}`;
 }
 
-// googleMap();
-// // Try to use GoogleMaps API to get a map.
-// function googleMap() {
-//   // console.log, long);
-//   var mapProp = {
-//     center: new google.maps.LatLng(40.738, -73.9858),
-//     zoom: 5,
-//   };
-//   const map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
-// }
+// Setup the map with the users location as the center.
+function initMap(lat, lang) {
+  const map = new google.maps.Map(document.getElementById('map'), {
+    center: { lat: lat, lng: lang },
+    zoom: 17,
+    zoomControl: true,
+    disableDefaultUI: true,
+    mapTypeId: 'roadmap'
+  });
+  // map.setTilt(45);
+}
 
 // Copied from Stack Overflow, adds the correct suffix to our date.
 function suffix() {

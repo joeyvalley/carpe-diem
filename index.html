@@ -5,7 +5,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Today is...</title>
+  <title>Carpe Diem</title>
+  <link rel="icon" type="image/png" href="./assets/smile.png">
 
   <!-- Google Maps -->
   <script src="script.js" defer></script>
@@ -16,30 +17,25 @@
 
 <body>
   <nav>
-    <p>ℹ️<span id="today"></span><span id="time"></span><span id="location"></span></p>
+    <span id="today" class="date"></span><span id="location" class="date"></span><span id="time" class="date"></span>
   </nav>
   <div id="main">
     <div id="grid-left">
       <div class="grid-box" id="today-info">
         <p id="holidays-p"></p>
       </div>
-      <div class="grid-box" id="birthdays">
+      <div class="grid-box" id="history">
         <div class="header">
-          <p class="date" id="birthdays-p">Birthdays &#128118;</p>
+          <p class="date" id="history-p"> Today in History &#128214;</p>
         </div>
       </div>
     </div>
     <div id="grid-center">
       <div class="grid-box">
         <div class="header">
-          <p>YOu are here.</p>
+          <p class="date" id="maps-p">You are here. &#128373;</p>
         </div>
         <div class="grid-img" id="map">
-        </div>
-      </div>
-      <div class="grid-box" id="deathdays">
-        <div class="header">
-          <p class="date" id="deathdays-p">Deathdays &#128128;</p>
         </div>
       </div>
       <div class="grid-box" id="news">
@@ -47,16 +43,21 @@
           <p class="date" id="news-p">In The News &#128240;</p>
         </div>
       </div>
-    </div>
-    <div id="grid-right">
-      <div class="grid-box" id="history">
-        <div class="header">
-          <p class="date" id="history-p">History &#128197;</p>
-        </div>
-      </div>
       <div class="grid-box" id="featured">
         <div class="header">
           <p class="date" id="featured-p">Featured Article &#128478;</p>
+        </div>
+      </div>
+    </div>
+    <div id="grid-right">
+      <div class="grid-box top-one" id="birthdays">
+        <div class="header">
+          <p class="date" id="birthdays-p">Birthdays &#128118;</p>
+        </div>
+      </div>
+      <div class="grid-box bottom-one" id="deathdays">
+        <div class="header">
+          <p class="date" id="deathdays-p">Deathdays &#128128;</p>
         </div>
       </div>
     </div>
