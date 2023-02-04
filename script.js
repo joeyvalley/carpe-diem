@@ -8,7 +8,8 @@ const monthStr = monthArr[month - 1];
 const year = today.getFullYear();
 const wikiAllURL = `https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/all/${month}/${day}`;
 const wikiFeaturedURL = `https://api.wikimedia.org/feed/v1/wikipedia/en/featured/${year}/${month}/${String(today.getDate()).padStart(2, '0')}`;
-const entriesNum = 5;
+const entriesNum = 8;
+
 
 
 // Call the functions to set up the page.
@@ -17,6 +18,8 @@ addHeaderEventListeners();
 wikiAllFetch(wikiAllURL); // Gets and sets the content for selected articles, births, deaths, and holidays.
 wikiFeaturedFetch(wikiFeaturedURL); // Gets and sets the content for today's featured article.
 nyTimesFetch();
+getHoroscope();
+youtubeFetch();
 
 function setUpNavBar() {
   // Set the date at left.
@@ -123,7 +126,7 @@ function setUpNavBar() {
 
 // Async function that gets and sets our data from the daily Wikipedia landing page.
 async function wikiAllFetch(URL) {
-  console.log(URL);
+  // console.log(URL);
   try {
     const res = await fetch(URL);
     const jsonObject = await res.json();
@@ -144,7 +147,7 @@ async function wikiAllFetch(URL) {
 
 // Async function that gets and sets our date from Wikipedia's featured article of the day.
 async function wikiFeaturedFetch(URL) {
-  console.log(URL);
+  // console.log(URL);
   try {
     const res = await fetch(URL);
     const jsonObject = await res.json();
@@ -180,8 +183,26 @@ function setNewsArticles(articles) {
   content.classList.add("content");
   content.id = "news-content";
   articles.forEach(article => {
+    // console.log(article);
     const p = document.createElement("p");
-    p.innerHTML = `<span class="date">${article.title}</span><br/>${article.abstract}`;
+    let section = article.section;
+    switch (section) {
+      case "business":
+        section = section[0].toUpperCase() + section.substring(1);
+        break;
+      case "us":
+        section = "US News"
+        break;
+      case "crosswords":
+        section = "Games";
+        break;
+      case "opinion":
+        section = "Opinion"
+        break;
+      default:
+        section = section[0].toUpperCase() + section.substring(1) + " News";
+    }
+    p.innerHTML = `<span class="date"><a href="${article.url}" target="_blank">${section}</a></span><br/>${article.abstract}`;
     content.append(p);
   });
   const footer = document.createElement("p");
@@ -215,7 +236,7 @@ function getHistory(selected, selections = []) {
   // Sort the array by year in order to display the information chronologically.
   selections.sort((a, b) => a.year - b.year);
   // Add the sorted data to the DOM.
-  setHistory(selections);
+  setHistory(selections.reverse());
 }
 
 function setHistory(selections) {
@@ -238,13 +259,16 @@ function setHistory(selections) {
 }
 
 function getHolidays(holidays) {
-  const holiday = holidays[0].text;
-  const description = holidays[0].pages[0].extract;
+  const randHoliday = Math.floor(Math.random() * holidays.length);
+  // console.log(holidays[randHoliday]);
+  const holiday = holidays[randHoliday].text;
+  const description = holidays[randHoliday].pages[0].extract;
+  const link = holidays[randHoliday].pages[0].content_urls.desktop.page;
   const daySuffix = suffix();
 
   const container = document.getElementById("today-info");
   const p = document.createElement("p")
-  p.innerHTML = `It is the <span class="date">${daySuffix}</span> of the year.<br /><br />It's <span class="date">${holiday}</span>. ${description}`;
+  p.innerHTML = `It is the <span class="date">${daySuffix}</span> of the year.<br /><br />It's <span class="date"><a href="${link}" target="_blank">${holiday}</a></span>. ${description}`;
   container.append(p);
 }
 
@@ -377,17 +401,15 @@ async function getLocation(URL) {
   try {
     const res = await fetch(URL);
     const jsonObject = await res.json();
-    // console.log(jsonObject);
-    const city = jsonObject.city;
+    // console.log(jsonObject); const city = jsonObject.city;
     const state = jsonObject.region_iso_code;
     const zipCode = jsonObject.postal_code;
     const country = jsonObject.country_code;
-    // const flagEmoji = jsonObject.flag.emoji;
-    setLocation(city, state, zipCode, country);
+    // setLocation(city, state, zipCode, country);
     initMap(jsonObject.latitude, jsonObject.longitude);
   } catch (error) {
     // If the Location API shits out, just plug in the center of the universe.
-    console.log("Location API is not working.");
+    console.log(error);
     initMap(40.712776, -74.005974);
   }
 }
@@ -407,6 +429,7 @@ function initMap(lat, lang) {
     disableDefaultUI: true,
     mapTypeId: 'roadmap'
   });
+  document.getElementById("map").id = "peepee";
   // map.setTilt(45);
 }
 
@@ -437,3 +460,79 @@ function suffix() {
 //   const left = document.getElementById("grid-left");
 //   left.style.position = "fixed";
 // });
+
+
+async function getHoroscope(horoscopes = []) {
+  const signs = [
+    { sign: "aries", symbol: "&#9800;" },
+    { sign: "taurus", symbol: "&#9801;" },
+    { sign: "gemini", symbol: "&#9802;" },
+    { sign: "cancer", symbol: "&#9803;" },
+    { sign: "leo", symbol: "&#9804;" },
+    { sign: "virgo", symbol: "&#9805;" },
+    { sign: "libra", symbol: "&#9806;" },
+    { sign: "scorpio", symbol: "&#9807;" },
+    { sign: "sagittarius", symbol: "&#9808;" },
+    { sign: "capricorn", symbol: "&#9809;" },
+    { sign: "aquarius", symbol: "&#9810;" },
+    { sign: "pisces", symbol: "&#9811;" }
+  ];
+  try {
+    for (let i = 0; i < signs.length; i++) {
+      const options = { method: 'POST', headers: { 'X-RapidAPI-Key': 'caed20f691msh9abdd5eb98e3543p1ed232jsn8a4c5b3b5f0b', 'X-RapidAPI-Host': 'sameer-kumar-aztro-v1.p.rapidapi.com' } };
+      const res = await fetch(`https://sameer-kumar-aztro-v1.p.rapidapi.com/?sign=${signs[i].sign}&day=today`, options);
+      let sign = signs[i].sign;
+      let symbol = signs[i].symbol;
+      sign = sign[0].toUpperCase() + sign.substring(1);
+      const horoscope = await res.json();
+      const mood = horoscope.mood;
+      const luckyNo = horoscope.lucky_number;
+      const description = horoscope.description;
+      horoscopes.push({ sign: sign, symbol: symbol, mood: mood, luckyNo: luckyNo, description: description });
+    }
+    setHoroscope(horoscopes);
+  }
+  catch (error) {
+    console.log(error);
+  }
+
+  // setHoroscope(jsonResponse, sign);
+}
+
+function setHoroscope(horoscopes) {
+  const container = document.getElementById("horoscope");
+  const content = document.createElement("div");
+  content.classList.add("content");
+  content.id = "horoscope-content";
+  for (const horoscope of horoscopes) {
+    let p = document.createElement("p");
+    p.innerHTML = `<span class="date">${horoscope.symbol} ${horoscope.sign}</span><br />${horoscope.description}<br /><span class="date">Lucky Number:</span> ${horoscope.luckyNo}`;
+    content.append(p);
+  }
+  container.append(content);
+}
+
+async function youtubeFetch() {
+  const URL = "https://youtube.googleapis.com/youtube/v3/search?q=daily%20horoscope&channelId=UCB1qdEA63QN-eptTZLV8xxA&maxResults=1&order=date&key=AIzaSyDKJnzUeLMF750WbkItYzJRds5FSIxbOgM";
+
+  try {
+    const res = await fetch(URL);
+    const jsonResponse = await res.json();
+    const videoId = jsonResponse.items[0].id.videoId;
+
+    const container = document.getElementById("youtube");
+    const width = (container.offsetWidth) - 20;
+    const height = Math.floor(width / 1.77777777777778);
+    console.log(width, height);
+    const content = document.createElement("div");
+    const embed = `<iframe width="${width}" height="${height}" src="https://www.youtube.com/embed/${videoId}" title="Today's Horoscopes" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>`;
+
+    content.classList.add("youtube-vid");
+    content.id = "youtube-vid";
+    content.innerHTML = embed;
+    container.append(content);
+  }
+  catch (error) {
+    console.log(error);
+  }
+}

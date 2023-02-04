@@ -117,7 +117,7 @@ footer p {
   padding: 0;
   margin-bottom: 10px;
   border: 1px solid black;
-  height: 250px;
+  height: fit-content;
 }
 
 .grid-box p {
