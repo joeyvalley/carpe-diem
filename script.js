@@ -122,6 +122,8 @@ function setUpNavBar() {
   // Set up the first grid-box
   const p = document.getElementById("holidays-p");
   p.innerHTML = `<span class="date">Today is ${monthStr} ${day}, ${year}.</span> &#128197;`;
+  addFooter();
+
 }
 
 // Async function that gets and sets our data from the daily Wikipedia landing page.
@@ -231,6 +233,7 @@ function getHistory(selected, selections = []) {
   // Loop through our random array and pull out the entry at the random index.
   while (randEntries.length > 0) {
     let currSelection = selected[randEntries.pop()];
+    // console.log(currSelection);
     selections.push({ year: currSelection.year, description: currSelection.text });
   }
   // Sort the array by year in order to display the information chronologically.
@@ -350,7 +353,7 @@ function setFeaturedArticle(article) {
 
   const footer = document.createElement("p");
   footer.classList.add("bottom");
-  footer.innerHTML = "&#128563; HOLY SHIT THAT'S AMAZING &#128563;";
+  footer.innerHTML = "&#128563; ʜᴏʟʏ ꜱʜɪᴛ ᴛʜᴀᴛ'ꜱ ᴀᴍᴀᴢɪɴɢ &#128563;";
   content.append(footer);
 
   container.append(content);
@@ -428,6 +431,7 @@ function setLocation(city, state, zipCode, country) {
 
 // Setup the map with the users location as the center.
 function initMap(lat, lang) {
+  // console.log(lat, lang);
   const map = new google.maps.Map(document.getElementById('map'), {
     center: { lat: lat, lng: lang },
     zoom: 14,
@@ -460,14 +464,7 @@ function suffix() {
   return i + "th";
 }
 
-
-// const middle = document.getElementById("grid-center");
-// middle.addEventListener('mouseover', () => {
-//   const left = document.getElementById("grid-left");
-//   left.style.position = "fixed";
-// });
-
-
+// Get horoscopes from RapidAPI
 async function getHoroscope(horoscopes = []) {
   const signs = [
     { sign: "aries", symbol: "&#9800;" },
@@ -505,6 +502,8 @@ async function getHoroscope(horoscopes = []) {
   // setHoroscope(jsonResponse, sign);
 }
 
+
+// Add horoscopes to DOM
 function setHoroscope(horoscopes) {
   const container = document.getElementById("horoscope");
   const content = document.createElement("div");
@@ -515,6 +514,10 @@ function setHoroscope(horoscopes) {
     p.innerHTML = `<span class="date">${horoscope.symbol} ${horoscope.sign}</span><br />${horoscope.description}<br /><span class="date">Lucky Number:</span> ${horoscope.luckyNo}`;
     content.append(p);
   }
+  const footer = document.createElement("p");
+  footer.innerHTML = `<p class="bottom">&#127756; ɪᴛ'ꜱ ᴡʀɪᴛᴛᴇɴ ɪɴ ᴛʜᴇ ꜱᴛᴀʀꜱ &#127756;</p>`;
+  content.append(footer);
+
   container.append(content);
 }
 
@@ -542,3 +545,12 @@ async function youtubeFetch() {
     console.log(error);
   }
 }
+
+function addFooter() {
+  const footer = document.createElement("p");
+  footer.classList.add("bottom")
+  footer.innerHTML = "&#127748; ᴄᴀʀᴘᴇ ᴅɪᴇᴍ &#127748;"
+  const container = document.getElementById("today-info");
+  container.append(footer);
+}
+
