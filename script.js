@@ -347,6 +347,12 @@ function setFeaturedArticle(article) {
   const p = document.createElement("p");
   p.innerHTML = `<span class="date"><a href="${link}" target="_blank">${title}</a></span><br />${description}`;
   content.append(p);
+
+  const footer = document.createElement("p");
+  footer.classList.add("bottom");
+  footer.innerHTML = "&#128563; HOLY SHIT THAT'S AMAZING &#128563;";
+  content.append(footer);
+
   container.append(content);
 }
 
@@ -523,7 +529,7 @@ async function youtubeFetch() {
     const container = document.getElementById("youtube");
     const width = (container.offsetWidth) - 20;
     const height = Math.floor(width / 1.77777777777778);
-    console.log(width, height);
+    // console.log(width, height);
     const content = document.createElement("div");
     const embed = `<iframe width="${width}" height="${height}" src="https://www.youtube.com/embed/${videoId}" title="Today's Horoscopes" frameborder="0" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; web-share"></iframe>`;
 
