@@ -10,8 +10,6 @@ const wikiAllURL = `https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/all
 const wikiFeaturedURL = `https://api.wikimedia.org/feed/v1/wikipedia/en/featured/${year}/${month}/${String(today.getDate()).padStart(2, '0')}`;
 const entriesNum = 5;
 
-// console.log(wikiAllURL);
-
 // Call the functions to set up the page.
 setUpNavBar(); // Gets and sets the content for the navigation bar.
 addHeaderEventListeners();
@@ -87,53 +85,52 @@ function setUpNavBar() {
   }
 
   // Add event listener to select bar to clear out HTML and re-populate with results of new API call.
-  // selectBar.addEventListener('change', (e) => {
-  //   try {
-  //     console.log(e.target.value);
-  //     document.getElementById("news").remove();
-  //     const newMonth = e.target.value.split("/")[0].padStart(2, '0');
-  //     const newDay = e.target.value.split("/")[1].padStart(2, '0');
-  //     const newYear = e.target.value.split("/")[2];
-  //     const newWikiSearch1 = `https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/all/${newMonth}/${newDay}`;
-  //     const newWikiSearch2 = `https://api.wikimedia.org/feed/v1/wikipedia/en/featured/${newYear}/${newMonth}/${newDay}`;
-  //     console.log(newWikiSearch1);
-  //     console.log(newWikiSearch2);
-  //     // console.log(newMonth, newDay, newYear);
-  //     const contentBoxes = Array.from(document.querySelectorAll(".grid-box"));
-  //     for (box in contentBoxes) {
-  //       let contentBox = contentBoxes[box].querySelector(".content");
-  //       if (contentBox === null) {
-  //         console.log("haha");
-  //       }
-  //       else {
-  //         contentBox.innerHTML = "";
-  //       }
-  //     }
-  //     wikiAllFetch(newWikiSearch1);
-  //     wikiFeaturedFetch(newWikiSearch2);
-  //   }
-  //   catch (error) {
-  //     console.log(error);
-  //   }
-  // })
+  selectBar.addEventListener('change', (e) => {
+    try {
+      console.log(e.target.value);
+      document.getElementById("news").remove();
+      const newMonth = e.target.value.split("/")[0].padStart(2, '0');
+      const newDay = e.target.value.split("/")[1].padStart(2, '0');
+      const newYear = e.target.value.split("/")[2];
+      const newWikiSearch1 = `https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/all/${newMonth}/${newDay}`;
+      const newWikiSearch2 = `https://api.wikimedia.org/feed/v1/wikipedia/en/featured/${newYear}/${newMonth}/${newDay}`;
+      console.log(newWikiSearch1);
+      console.log(newWikiSearch2);
+      // console.log(newMonth, newDay, newYear);
+      const contentBoxes = Array.from(document.querySelectorAll(".grid-box"));
+      for (box in contentBoxes) {
+        let contentBox = contentBoxes[box].querySelector(".content");
+        if (contentBox === null) {
+          console.log("haha");
+        }
+        else {
+          contentBox.innerHTML = "";
+        }
+      }
+      // wikiAllFetch(newWikiSearch1);
+      // wikiFeaturedFetch(newWikiSearch2);
+      alert(newWikiSearch1, newWikiSearch2);
+    }
+    catch (error) {
+      console.log(error);
+    }
+  })
   // Start the clock.
   startTime();
   // Get IP address and location.
   getIP();
   // Set up the first grid-box
   const p = document.getElementById("holidays-p");
-  p.innerHTML = `<span class="date">Today is ${monthStr} ${day}, ${year}.</span> &#128197;`;
-  // addFooter();
+  p.innerHTML = `Today is  <span class="date">${monthStr} ${day}, ${year}.</span>`;
+
 
 }
 
 // Async function that gets and sets our data from the daily Wikipedia landing page.
 async function wikiAllFetch(URL) {
-  console.log(URL);
   try {
     const res = await fetch(URL);
     const jsonObject = await res.json();
-    console.log(jsonObject);
     // Store the API responses as arrays in their individual categories.
     const births = jsonObject.births;
     const deaths = jsonObject.deaths;
@@ -275,6 +272,8 @@ function getHolidays(holidays) {
   const p = document.createElement("p")
   p.innerHTML = `It is the <span class="date">${daySuffix}</span> of the year.<br /><br />It's <span class="date"><a href="${link}" target="_blank">${holiday}</a></span>. ${description}`;
   container.append(p);
+  addFooter();
+
 }
 
 function getBirths(births, theLiving = []) {
@@ -436,7 +435,7 @@ function initMap(lat, lang) {
   // console.log(lat, lang);
   const map = new google.maps.Map(document.getElementById('map'), {
     center: { lat: lat, lng: lang },
-    zoom: 14,
+    zoom: 15,
     zoomControl: true,
     disableDefaultUI: true,
     mapTypeId: 'roadmap'
@@ -548,11 +547,11 @@ async function youtubeFetch() {
   }
 }
 
-// function addFooter() {
-//   const footer = document.createElement("p");
-//   footer.classList.add("bottom")
-//   footer.innerHTML = "&#127748; ᴄᴀʀᴘᴇ ᴅɪᴇᴍ &#127748;"
-//   const container = document.getElementById("today-info");
-//   container.append(footer);
-// }
+function addFooter() {
+  const footer = document.createElement("p");
+  footer.classList.add("bottom")
+  footer.innerHTML = "&#127758; ᴄᴀʀᴘᴇ ᴅɪᴇᴍ &#127759;"
+  const container = document.getElementById("today-info");
+  container.append(footer);
+}
 
