@@ -15,7 +15,7 @@ const entriesNum = 5;
 // Call the functions to set up the page.
 setUpNavBar(); // Gets and sets the content for the navigation bar.
 addHeaderEventListeners();
-// wikiAllFetch(wikiAllURL); // Gets and sets the content for selected articles, births, deaths, and holidays.
+wikiAllFetch(wikiAllURL); // Gets and sets the content for selected articles, births, deaths, and holidays.
 wikiFeaturedFetch(wikiFeaturedURL); // Gets and sets the content for today's featured article.
 nyTimesFetch();
 getHoroscope();
@@ -135,15 +135,15 @@ async function wikiAllFetch(URL) {
     const jsonObject = await res.json();
     console.log(jsonObject);
     // Store the API responses as arrays in their individual categories.
-    // const births = jsonObject.births;
-    // const deaths = jsonObject.deaths;
-    // const events = jsonObject.events;
-    // const holidays = jsonObject.holidays;
-    // const selected = jsonObject.selected;
-    // getBirths(births);
-    // getDeaths(deaths);
-    // getHistory(selected);
-    // getHolidays(holidays);
+    const births = jsonObject.births;
+    const deaths = jsonObject.deaths;
+    const events = jsonObject.events;
+    const holidays = jsonObject.holidays;
+    const selected = jsonObject.selected;
+    getBirths(births);
+    getDeaths(deaths);
+    getHistory(selected);
+    getHolidays(holidays);
   } catch (error) {
     console.log(error);
   }
@@ -231,7 +231,7 @@ function addHeaderEventListeners() {
 
 function getHistory(selected, selections = []) {
   // Generate random numbers to use as indexes to pull from the "selection" array.
-  const randEntries = randomSelection(selected.length, 15);
+  const randEntries = randomSelection(selected.length, 5);
   // Loop through our random array and pull out the entry at the random index.
   while (randEntries.length > 0) {
     let currSelection = selected[randEntries.pop()];
@@ -441,7 +441,7 @@ function initMap(lat, lang) {
     disableDefaultUI: true,
     mapTypeId: 'roadmap'
   });
-  document.getElementById("map").id = "peepee";
+  // document.getElementById("map").id = "peepee";
   // map.setTilt(45);
 }
 
