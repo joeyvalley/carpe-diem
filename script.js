@@ -1,23 +1,34 @@
 
-// Declare our global variables.
+// Global variables.
 const today = new Date();
 const day = String(today.getDate());
 const month = String(today.getMonth() + 1).padStart(2, '0');
 const monthArr = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const monthStr = monthArr[month - 1];
 const year = today.getFullYear();
+// The number of entries for each category (historical events, birthdays, deathdays) that we want to pull.
+const entriesNum = 10;
+
+// Our non-static API endpoints.
 const wikiAllURL = `https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/all/${month}/${day.padStart(2, '0')}`;
 const wikiFeaturedURL = `https://api.wikimedia.org/feed/v1/wikipedia/en/featured/${year}/${month}/${String(today.getDate()).padStart(2, '0')}`;
-const entriesNum = 5;
 
-// Call the functions to set up the page.
+// The function calls that set up the page.
 setUpNavBar(); // Gets and sets the content for the navigation bar.
-addHeaderEventListeners();
+addHeaderEventListeners(); // Adds event listener to the head of each content box that allows user to show and hide the content.
 wikiAllFetch(wikiAllURL); // Gets and sets the content for selected articles, births, deaths, and holidays.
 wikiFeaturedFetch(wikiFeaturedURL); // Gets and sets the content for today's featured article.
-nyTimesFetch();
-getHoroscope();
-youtubeFetch();
+nyTimesFetch(); // Gets and sets the top news stories of the day from NYTimes.com
+getHoroscope(); // Gets and sets horoscopes for all 12 zodiac signs.
+
+// NOTE: This is not working at the moment because I have exceeded my API request quota for
+// my trial key. I've added functionality to the try/catch that will remove the YouTube container 
+// from the DOM if the API request fails.
+youtubeFetch(); // Gets and sets the YouTube video for today's horoscope from a specific user.
+
+//
+// Our functions:
+//
 
 // Sets up the nav bar.
 function setUpNavBar() {
@@ -163,6 +174,7 @@ async function wikiFeaturedFetch(URL) {
   }
 }
 
+// Get five articles from NYTimes list of today's top articles.
 async function nyTimesFetch(articlesArr = [], sections = ['us', 'world', 'business', 'opinion', 'crosswords']) {
   const URL = "https://api.nytimes.com/svc/topstories/v2/home.json?api-key=DmexZKsgYhcssqlm8cy4sd1tMa7D6Uri";
 
@@ -177,7 +189,7 @@ async function nyTimesFetch(articlesArr = [], sections = ['us', 'world', 'busine
     console.log(error);
   }
 }
-
+// Add NYTimes articles to the DOM.
 function setNewsArticles(articles) {
   const container = document.getElementById("news");
   const content = document.createElement("div");
@@ -214,6 +226,7 @@ function setNewsArticles(articles) {
   container.append(content);
 }
 
+// Add event listeners to the headers of each content box.
 function addHeaderEventListeners() {
   const headers = Array.from(document.querySelectorAll(".header"));
   for (const header of headers) {
@@ -226,9 +239,19 @@ function addHeaderEventListeners() {
   }
 }
 
+// Get notable historical events.
 function getHistory(selected, selections = []) {
   // Generate random numbers to use as indexes to pull from the "selection" array.
-  const randEntries = randomSelection(selected.length, 5);
+  const randEntries = randomSelection(selected.length, selected.length);
+
+  // Make sure we're not requesting too many selections.
+  if (entriesNum <= selected.length) {
+    // console.log(entriesNum, selected.length, "That's ok.");
+    const randEntries = randomSelection(selected.length, entriesNum);
+  }
+  // else {
+  //   console.log(entriesNum, selected.length, "That's too many.");
+  // }
   // Loop through our random array and pull out the entry at the random index.
   while (randEntries.length > 0) {
     let currSelection = selected[randEntries.pop()];
@@ -241,6 +264,7 @@ function getHistory(selected, selections = []) {
   setHistory(selections.reverse());
 }
 
+// Add historical events to the DOM.
 function setHistory(selections) {
   const container = document.getElementById("history");
 
@@ -260,6 +284,7 @@ function setHistory(selections) {
   container.append(content);
 }
 
+// Get the holidays on this date and add a random one to the DOM.
 function getHolidays(holidays) {
   const randHoliday = Math.floor(Math.random() * holidays.length);
   // console.log(holidays[randHoliday]);
@@ -276,6 +301,7 @@ function getHolidays(holidays) {
 
 }
 
+// Get information about notable birthdays on this date.
 function getBirths(births, theLiving = []) {
   const randEntries = randomSelection(births.length, entriesNum);
   for (let i = 0; i < entriesNum; i++) {
@@ -286,6 +312,7 @@ function getBirths(births, theLiving = []) {
   setBirths(theLiving.reverse());
 }
 
+// Add birthdays to the DOM.
 function setBirths(theLiving) {
 
   const container = document.getElementById("birthdays");
@@ -306,6 +333,7 @@ function setBirths(theLiving) {
   container.append(content);
 }
 
+// Get information about notable deaths on this date.
 function getDeaths(deaths, theDead = []) {
   const randEntries = randomSelection(deaths.length, entriesNum);
   for (let i = 0; i < entriesNum; i++) {
@@ -316,6 +344,7 @@ function getDeaths(deaths, theDead = []) {
   setDeaths(theDead.reverse());
 }
 
+// Add deathdays information to the DOM.
 function setDeaths(theDead) {
 
   const container = document.getElementById("deathdays");
@@ -373,7 +402,8 @@ function randomSelection(upperLimit, entriesNum, randArr = []) {
   return (randArr);
 }
 
-// Copy and paste clock code from W3Schools : )
+// Start and run the clock.
+// Code copy/pasted from from W3Schools.
 function startTime() {
   const today = new Date();
   let h = today.getHours();
@@ -387,7 +417,7 @@ function startTime() {
   setTimeout(startTime, 1000);
 }
 
-// Update the clock every second.
+// Format the clock times.
 function checkTime(i) {
   if (i < 10) { i = "0" + i };  // add zero in front of numbers < 10
   return i;
@@ -406,25 +436,26 @@ async function getIP() {
   }
 }
 
-// Get users physical location.
+// Get users physical location and send it to our map function to generate a map
+// centered on their current location.
 async function getLocation(URL) {
   try {
     const res = await fetch(URL);
     const jsonObject = await res.json();
-    // console.log(jsonObject); const city = jsonObject.city;
-    const state = jsonObject.region_iso_code;
-    const zipCode = jsonObject.postal_code;
-    const country = jsonObject.country_code;
-    // setLocation(city, state, zipCode, country);
+    // const state = jsonObject.region_iso_code;
+    // const zipCode = jsonObject.postal_code;
+    // const country = jsonObject.country_code;
     initMap(jsonObject.latitude, jsonObject.longitude);
-  } catch (error) {
-    // If the Location API shits out, just plug in the center of the universe.
-    console.log(error);
+  }
+  // If the Location API shits out, just plug in the center of the universe.
+  catch (error) {
     initMap(40.712776, -74.005974);
+    console.log(error);
   }
 }
 
-// Set users physical location in the navigation bar.
+// Set users physical location in the navigation bar. 
+// NOT USING THIS FUNCTION ANYMORE.
 function setLocation(city, state, zipCode, country) {
   const location = document.getElementById("location");
   location.innerText = `${city}, ${state} ${country}`;
@@ -440,8 +471,6 @@ function initMap(lat, lang) {
     disableDefaultUI: true,
     mapTypeId: 'roadmap'
   });
-  // document.getElementById("map").id = "peepee";
-  // map.setTilt(45);
 }
 
 // Copied from Stack Overflow, adds the correct suffix to our date.
@@ -503,7 +532,6 @@ async function getHoroscope(horoscopes = []) {
   // setHoroscope(jsonResponse, sign);
 }
 
-
 // Add horoscopes to DOM
 function setHoroscope(horoscopes) {
   const container = document.getElementById("horoscope");
@@ -522,13 +550,16 @@ function setHoroscope(horoscopes) {
   container.append(content);
 }
 
+// Search for today's horoscope on YouTube and add an i-frame to the page with the result.
 async function youtubeFetch() {
   const URL = "https://youtube.googleapis.com/youtube/v3/search?q=daily%20horoscope&channelId=UCB1qdEA63QN-eptTZLV8xxA&maxResults=1&order=date&key=AIzaSyDKJnzUeLMF750WbkItYzJRds5FSIxbOgM";
 
   try {
     const res = await fetch(URL);
     const jsonResponse = await res.json();
+    console.log(jsonResponse);
     const videoId = jsonResponse.items[0].id.videoId;
+
 
     const container = document.getElementById("youtube");
     const width = (container.offsetWidth) - 20;
@@ -544,9 +575,12 @@ async function youtubeFetch() {
   }
   catch (error) {
     console.log(error);
+    document.getElementById("youtube").remove();
   }
 }
 
+// Add footer to the holidays div. We have to do it this way because we can only add this div once
+// the other content divs have been populated.
 function addFooter() {
   const footer = document.createElement("p");
   footer.classList.add("bottom")
