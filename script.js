@@ -6,21 +6,22 @@ const month = String(today.getMonth() + 1).padStart(2, '0');
 const monthArr = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const monthStr = monthArr[month - 1];
 const year = today.getFullYear();
-const wikiAllURL = `https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/all/${month}/${day}`;
+const wikiAllURL = `https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/all/${month}/${day.padStart(2, '0')}`;
 const wikiFeaturedURL = `https://api.wikimedia.org/feed/v1/wikipedia/en/featured/${year}/${month}/${String(today.getDate()).padStart(2, '0')}`;
-const entriesNum = 8;
+const entriesNum = 5;
 
-
+// console.log(wikiAllURL);
 
 // Call the functions to set up the page.
 setUpNavBar(); // Gets and sets the content for the navigation bar.
 addHeaderEventListeners();
-wikiAllFetch(wikiAllURL); // Gets and sets the content for selected articles, births, deaths, and holidays.
+// wikiAllFetch(wikiAllURL); // Gets and sets the content for selected articles, births, deaths, and holidays.
 wikiFeaturedFetch(wikiFeaturedURL); // Gets and sets the content for today's featured article.
 nyTimesFetch();
 getHoroscope();
 youtubeFetch();
 
+// Sets up the nav bar.
 function setUpNavBar() {
   // Set the date at left.
   const selectBar = document.getElementById("today");
@@ -122,26 +123,27 @@ function setUpNavBar() {
   // Set up the first grid-box
   const p = document.getElementById("holidays-p");
   p.innerHTML = `<span class="date">Today is ${monthStr} ${day}, ${year}.</span> &#128197;`;
-  addFooter();
+  // addFooter();
 
 }
 
 // Async function that gets and sets our data from the daily Wikipedia landing page.
 async function wikiAllFetch(URL) {
-  // console.log(URL);
+  console.log(URL);
   try {
     const res = await fetch(URL);
     const jsonObject = await res.json();
+    console.log(jsonObject);
     // Store the API responses as arrays in their individual categories.
-    const births = jsonObject.births;
-    const deaths = jsonObject.deaths;
-    const events = jsonObject.events;
-    const holidays = jsonObject.holidays;
-    const selected = jsonObject.selected;
-    getBirths(births);
-    getDeaths(deaths);
-    getHistory(selected);
-    getHolidays(holidays);
+    // const births = jsonObject.births;
+    // const deaths = jsonObject.deaths;
+    // const events = jsonObject.events;
+    // const holidays = jsonObject.holidays;
+    // const selected = jsonObject.selected;
+    // getBirths(births);
+    // getDeaths(deaths);
+    // getHistory(selected);
+    // getHolidays(holidays);
   } catch (error) {
     console.log(error);
   }
@@ -546,11 +548,11 @@ async function youtubeFetch() {
   }
 }
 
-function addFooter() {
-  const footer = document.createElement("p");
-  footer.classList.add("bottom")
-  footer.innerHTML = "&#127748; ᴄᴀʀᴘᴇ ᴅɪᴇᴍ &#127748;"
-  const container = document.getElementById("today-info");
-  container.append(footer);
-}
+// function addFooter() {
+//   const footer = document.createElement("p");
+//   footer.classList.add("bottom")
+//   footer.innerHTML = "&#127748; ᴄᴀʀᴘᴇ ᴅɪᴇᴍ &#127748;"
+//   const container = document.getElementById("today-info");
+//   container.append(footer);
+// }
 
